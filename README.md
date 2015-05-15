@@ -23,8 +23,7 @@ angular.module('yourapp', ['PlPush']);
 
 This library includes the `PushSrv` service, which you will use to register devices and handle incoming notifications. The most common use case, for both Android and iOS, would be:
 
-```
-
+```javascript
 var app = angular.module('myApp', ['PlPush']);
 
 app.config(function(PushConfigProvider){
