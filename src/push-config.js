@@ -18,11 +18,11 @@
     };
 
     function PushConfig() {
-      this.getGcmSenderId = function(value) {
+      this.getGcmSenderId = function() {
         return gcmSenderId;
       };
 
-      this.getLocalStorageKey = function(value) {
+      this.getLocalStorageKey = function() {
         return localStorageKey;
       };
     }
