@@ -8,7 +8,6 @@
   PushSrv.$inject = ['$rootScope', 'LocalDataSrv', 'PushConfig', '$cordovaPush'];
 
   function PushSrv($rootScope, LocalDataSrv, PushConfig, $cordovaPush) {
-    var msgCallback;
     var regCallback;
     var errorCallback;
     var gcmSenderId = PushConfig.getGcmSenderId();
@@ -30,7 +29,10 @@
     }
  
     function onMessage(cb) {
-      msgCallback = cb;
+      $rootScope.on('$cordovaPush:notificationReceived', function(event, notification){
+        if (ionic.Platform.isAndroid()) androidPushReceived(event, notification);
+        cb(notification);
+      });
     }
  
     // returns an object to the callback with source and token properties
@@ -39,14 +41,8 @@
       errorCallback = errorCb;
  
       document.addEventListener('deviceready', function(){
-        if (ionic.Platform.isAndroid()) { // Should not rely on Ionic
-          registerAndroid();
-          $rootScope.$on('$cordovaPush:notificationReceived', androidPushReceived);
-        }
-        if (ionic.Platform.isIOS()) { // Should not rely on Ionic
-          registerIOS();
-          $rootScope.$on('$cordovaPush:notificationReceived', iosPushReceived);
-        }
+        if (ionic.Platform.isAndroid()) registerAndroid();
+        if (ionic.Platform.isIOS()) registerIOS();
       });
  
       return this;
@@ -95,35 +91,17 @@
  
     // Process incoming push messages from android
     function androidPushReceived(event, notification) {
-      switch(notification.event) {
-        case 'registered':
-          if (notification.regid.length > 0 ) {
-            setToken(notification.regid);
-            if (regCallback !== undefined) {
-              regCallback({
-                source: 'android',
-                token: notification.regid
-              });
-            }
+      if(notification.event == 'registered') {
+        if (notification.regid.length > 0 ) {
+          setToken(notification.regid);
+          if (regCallback !== undefined) {
+            regCallback({
+              source: 'android',
+              token: notification.regid
+            });
           }
-          break;
- 
-        case 'message':
-          if (msgCallback !== undefined) { msgCallback(notification); }
-          break;
- 
-        case 'error':
-          console.log('GCM error = ' + notification.msg);
-          break;
- 
-        default:
-          console.log('An unknown GCM event has occurred');
-          break;
+        }
       }
-    }
- 
-    function iosPushReceived(event, notification) {
-      if (msgCallback !== undefined) { msgCallback(notification); }
     }
   }
 
