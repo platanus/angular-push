@@ -29,13 +29,12 @@
     }
  
     function onMessage(cb) {
-      $rootScope.on('$cordovaPush:notificationReceived', function(event, notification){
+      $rootScope.$on('$cordovaPush:notificationReceived', function(event, notification){
         if (ionic.Platform.isAndroid()) androidPushReceived(event, notification);
         cb(notification);
       });
     }
  
-    // returns an object to the callback with source and token properties
     function ensureRegistration(cb, errorCb) {
       regCallback = cb;
       errorCallback = errorCb;
@@ -52,15 +51,15 @@
       var config = {
         badge: true,
         sound: true,
-        alert: true,
+        alert: true
       };
  
       $cordovaPush.register(config).then(function(result) {
-        setToken(result.deviceToken);
+        setToken(result);
         if (regCallback !== undefined) {
           regCallback({
             source: 'ios',
-            token: result.deviceToken
+            token: result
           });
         }
       }, function(err) {
@@ -72,15 +71,11 @@
  
     }
  
-    // Inits the Android registration
-    // NOTICE: This will not set the token inmediatly, it will come
-    // on the androidPushReceived
     function registerAndroid() {
       var config = {
         senderID: gcmSenderId
       };
  
-      // PushPlugin's telerik only register if necesary or when upgrading app
       $cordovaPush.register(config).then(function(result) {
         console.log('Registration requested!');
       }, function(err) {
@@ -89,9 +84,8 @@
  
     }
  
-    // Process incoming push messages from android
     function androidPushReceived(event, notification) {
-      if(notification.event == 'registered') {
+      if(notification.event === 'registered') {
         if (notification.regid.length > 0 ) {
           setToken(notification.regid);
           if (regCallback !== undefined) {
