@@ -82,8 +82,8 @@ Thank you [contributors](https://github.com/platanus/angular-auth/graphs/contrib
 
 <img src="http://platan.us/gravatar_with_text.png" alt="Platanus" width="250"/>
 
-angular-auth is maintained by [platanus](http://platan.us).
+angular-push is maintained by [platanus](http://platan.us).
 
 ## License
 
-AngularAuth is © 2015 platanus, spa. It is free software and may be redistributed under the terms specified in the LICENSE file.
+AngularPush is © 2015 platanus, spa. It is free software and may be redistributed under the terms specified in the LICENSE file.
