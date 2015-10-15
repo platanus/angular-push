@@ -12,6 +12,7 @@ var paths = {
   dist: ['./dist/*.js'],
 };
 
+var sourceDest = 'angular-push.js';
 var sourceMin = 'angular-push.min.js';
 
 gulp.task('lint', function() {
@@ -20,10 +21,15 @@ gulp.task('lint', function() {
     .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('build', ['lint'], function() {
+gulp.task('preBuild', ['lint'], function() {
   return gulp.src(paths.src)
+    .pipe(concat(sourceDest))
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('build', ['preBuild'], function() {
+  return gulp.src(sourceDest)
     .pipe(uglify())
-    .pipe(concat(sourceMin))
     .pipe(size())
     .pipe(gulp.dest('dist'))
     .pipe(notify('Build finished'));
