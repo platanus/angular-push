@@ -15,8 +15,7 @@
   "ignore": [
     "**/.*",
     "package.json",
-    "test",
-    "src"
+    "test"
   ],
   "dependencies": {
     "ngCordova": "~0.1.15-alpha"
