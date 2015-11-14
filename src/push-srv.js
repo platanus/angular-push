@@ -5,60 +5,59 @@
     .module('PlPush')
     .service('PushSrv', PushSrv);
 
-  PushSrv.$inject = ['$rootScope', 'LocalDataSrv', 'PushConfig', '$cordovaPush'];
+  PushSrv.$inject = ['$rootScope', 'LocalDataSrv', 'PushConfig', '$cordovaPushV5'];
 
-  function PushSrv($rootScope, LocalDataSrv, PushConfig, $cordovaPush) {
+  function PushSrv($rootScope, LocalDataSrv, PushConfig, $cordovaPushV5) {
     var regCallback;
     var errorCallback;
     var gcmSenderId = PushConfig.getGcmSenderId();
- 
+
     var service = {
       ensureRegistration: ensureRegistration,
       getToken: getToken,
       onMessage: onMessage
     };
- 
+
     return service;
- 
-    function setToken(token) {
-      LocalDataSrv.setKey(PushConfig.getLocalStorageKey(), token);
-    }
- 
+
+
     function getToken() {
       return LocalDataSrv.getKey(PushConfig.getLocalStorageKey(), '');
     }
- 
+
     function onMessage(cb) {
-      $rootScope.$on('$cordovaPush:notificationReceived', function(event, notification){
-        if (ionic.Platform.isAndroid()) androidPushReceived(event, notification);
-        cb(notification);
+      $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, notification){
+        $rootScope.$applyAsync(function(){
+          cb(notification);
+        });
       });
     }
- 
+
     function ensureRegistration(cb, errorCb) {
       regCallback = cb;
       errorCallback = errorCb;
- 
-      document.addEventListener('deviceready', function(){
-        if (ionic.Platform.isAndroid()) registerAndroid();
-        if (ionic.Platform.isIOS()) registerIOS();
-      });
- 
+
+      document.addEventListener('deviceready', init);
+
       return this;
     }
- 
-    function registerIOS() {
-      var config = {
-        badge: true,
-        sound: true,
-        alert: true
-      };
- 
-      $cordovaPush.register(config).then(function(result) {
+
+    /// Private
+
+    function init(){
+      var config = getConfig();
+
+      $cordovaPushV5.initialize(config).then(register);
+      $cordovaPushV5.onNotification();
+      $cordovaPushV5.onError();
+    }
+
+    function register() {
+      $cordovaPushV5.register().then(function(result) {
         setToken(result);
         if (regCallback !== undefined) {
           regCallback({
-            source: 'ios',
+            source: ionic.Platform.platform(),
             token: result
           });
         }
@@ -66,36 +65,35 @@
         if (errorCallback !== undefined) {
           errorCallback(err);
         }
-        console.log('Registration error on IOS: ', err);
+        console.log('Registration error: ', err);
       });
- 
     }
- 
-    function registerAndroid() {
-      var config = {
-        senderID: gcmSenderId
-      };
- 
-      $cordovaPush.register(config).then(function(result) {
-        console.log('Registration requested!');
-      }, function(err) {
-        console.log('Error registering on Android', err);
-      });
- 
+
+    function setToken(token) {
+      LocalDataSrv.setKey(PushConfig.getLocalStorageKey(), token);
     }
- 
-    function androidPushReceived(event, notification) {
-      if(notification.event === 'registered') {
-        if (notification.regid.length > 0 ) {
-          setToken(notification.regid);
-          if (regCallback !== undefined) {
-            regCallback({
-              source: 'android',
-              token: notification.regid
-            });
-          }
-        }
+
+    function getConfig() {
+      var platform = ionic.Platform.platform();
+      var config, dataConfig = {};
+
+      switch(platform){
+      case 'ios':
+        config = {
+          badge: true,
+          sound: true,
+          alert: true
+        };
+        break;
+      case 'android':
+        config = {
+          senderID: gcmSenderId
+        };
+        break;
       }
+
+      dataConfig[platform] = config;
+      return dataConfig;
     }
   }
 

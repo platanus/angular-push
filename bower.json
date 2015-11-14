@@ -18,7 +18,7 @@
     "test"
   ],
   "dependencies": {
-    "ngCordova": "~0.1.15-alpha"
+    "ngCordova": "~0.1.23-alpha"
   },
   "devDependencies": {
     "angular": "~1.2.27",
