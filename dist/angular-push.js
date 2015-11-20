@@ -40,6 +40,10 @@ angular.module('PlPush', ['ngCordova']);
   function PushConfigProvider() {
     var gcmSenderId = null;
     var localStorageKey = 'plPush.pushToken';
+    var options = {
+      android: {},
+      ios: {}
+    };
 
     this.setGcmSenderId = function(value) {
       gcmSenderId = value;
@@ -47,6 +51,10 @@ angular.module('PlPush', ['ngCordova']);
 
     this.setLocalStorageKey = function(value) {
       localStorageKey = value;
+    };
+
+    this.setOptions = function(value) {
+      options = value;
     };
 
     function PushConfig() {
@@ -57,6 +65,10 @@ angular.module('PlPush', ['ngCordova']);
       this.getLocalStorageKey = function() {
         return localStorageKey;
       };
+
+      this.getOptions = function() {
+        return options;
+      };
     }
 
     this.$get = function() {
@@ -64,7 +76,6 @@ angular.module('PlPush', ['ngCordova']);
     };
   }
 }());
-
 
 (function() {
   'use strict';
@@ -79,6 +90,7 @@ angular.module('PlPush', ['ngCordova']);
     var regCallback;
     var errorCallback;
     var gcmSenderId = PushConfig.getGcmSenderId();
+    var extendedOptions = PushConfig.getOptions();
 
     var service = {
       ensureRegistration: ensureRegistration,
@@ -145,18 +157,22 @@ angular.module('PlPush', ['ngCordova']);
       var platform = ionic.Platform.platform();
       var config, dataConfig = {};
 
+      var iosDefaultConfig = {
+        badge: true,
+        sound: true,
+        alert: true
+      };
+
+      var androidDefaultConfig = {
+        senderID: gcmSenderId
+      };
+
       switch(platform){
       case 'ios':
-        config = {
-          badge: true,
-          sound: true,
-          alert: true
-        };
+        config = angular.extend({}, iosDefaultConfig, extendedOptions.ios);
         break;
       case 'android':
-        config = {
-          senderID: gcmSenderId
-        };
+        config = angular.extend({}, androidDefaultConfig, extendedOptions.android);
         break;
       }
 

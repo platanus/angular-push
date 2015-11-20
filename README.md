@@ -28,6 +28,16 @@ var app = angular.module('myApp', ['PlPush']);
 
 app.config(function(PushConfigProvider){
   PushConfigProvider.setGcmSenderId('YOUR GOOGLE PUSH SENDER ID');
+
+  // optional, more information in https://github.com/phonegap/phonegap-plugin-push
+  PushConfigProvider.setOptions({
+    ios: {
+      sound: false
+    },
+    android: {
+      vibrate: true
+    }
+  });
 });
 
 app.run(function(PushSrv){
@@ -62,7 +72,7 @@ This is the token generated through the registration process, which you'll need 
 
 **PushSrv.onMessage(callback)**
 
-This method receives a callback which is passed the `message` argument, containing the notification's data. 
+This method receives a callback which is passed the `message` argument, containing the notification's data.
 
 ## Android GCM
 
