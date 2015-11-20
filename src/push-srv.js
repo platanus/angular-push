@@ -11,6 +11,7 @@
     var regCallback;
     var errorCallback;
     var gcmSenderId = PushConfig.getGcmSenderId();
+    var extendedOptions = PushConfig.getOptions();
 
     var service = {
       ensureRegistration: ensureRegistration,
@@ -77,18 +78,22 @@
       var platform = ionic.Platform.platform();
       var config, dataConfig = {};
 
+      var iosDefaultConfig = {
+        badge: true,
+        sound: true,
+        alert: true
+      };
+
+      var androidDefaultConfig = {
+        senderID: gcmSenderId
+      };
+
       switch(platform){
       case 'ios':
-        config = {
-          badge: true,
-          sound: true,
-          alert: true
-        };
+        config = angular.extend({}, iosDefaultConfig, extendedOptions.ios);
         break;
       case 'android':
-        config = {
-          senderID: gcmSenderId
-        };
+        config = angular.extend({}, androidDefaultConfig, extendedOptions.android);
         break;
       }
 
