@@ -3,6 +3,12 @@ Platanus Angular Push
 
 Dead-easy push notification handling with the help of our PushNotification plugin and ngCordova. Provides a simple interface with which to register devices and act on incoming notifications.
 
+## Platanus Angular Push is no longer maintained.
+
+- We will leave the Issues open as a discussion forum only.
+- We do not guarantee a response from us in the Issues.
+- We are no longer accepting pull requests.
+
 ## Installation
 
 First of all, make sure you have installed ```ngCordova``` and the [Platanus ```PushNotification``` plugin](https://github.com/platanus/PushNotification) in your app.
